@@ -14,6 +14,7 @@ Widget buildBottomBar(BuildContext context, PageProvider pageProvider) {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
+        // Cart button
         GestureDetector(
           onTap: () => context.read<PageProvider>().setPage(0, context),
           child: const Column(
@@ -21,6 +22,7 @@ Widget buildBottomBar(BuildContext context, PageProvider pageProvider) {
             children: [Icon(AppIcons.cart), Text('카트')],
           ),
         ),
+        // Purchase button
         Consumer<PurchaseModeProvider>(
           builder: (context, purchaseProvider, _) {
             final isActive = purchaseProvider.isActive;
@@ -37,7 +39,19 @@ Widget buildBottomBar(BuildContext context, PageProvider pageProvider) {
             );
           },
         ),
+        // MoneyEarn button
         const MoneyEarnIcon(),
+        // Doodle button
+        GestureDetector(
+          onTap: () => context.read<PageProvider>().setPage(1, context),
+          child: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.brush),
+              Text('낙서하기'),
+            ],
+          ),
+        ),
       ],
     ),
   );

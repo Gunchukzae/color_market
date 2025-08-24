@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/cart_page.dart';
+import '../screens/doodle_controller_page.dart';
 import '../providers/page_provider.dart';
 import '../widgets/home_app_bar.dart';
 import '../widgets/home_interactive_grid.dart';
@@ -15,8 +16,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Widget> pages = const [
+  final List<Widget> pages = [
     CartPage(),
+    DoodleControllerPage(),
   ];
   
   @override
@@ -35,7 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(
           children: [
             const InteractiveGrid(),
-            buildPageStack(pageProvider),
+            Consumer<PageProvider>(
+              builder: (context, pageProvider, _) =>
+                  buildPageStack(pageProvider, [
+                    CartPage(),
+                    DoodleControllerPage(),
+                  ]),
+            ),
           ],
         ),
         bottomNavigationBar: buildBottomBar(context, pageProvider),
