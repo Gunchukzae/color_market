@@ -2,12 +2,12 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/rendering.dart' show applyBoxFit, BoxFit, FittedSizes;
+import 'package:flutter/rendering.dart' show applyBoxFit, BoxFit;
 import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:signature/signature.dart';
 
-/// controller 기반으로 스트로크 수집.
+// controller 기반으로 스트로크 수집.
 List<List<List<double>>> collectStrokes(SignatureController c) {
   final strokes = <List<List<double>>>[];
   final pts = c.points;
@@ -36,7 +36,7 @@ List<List<List<double>>> collectStrokes(SignatureController c) {
 }
 
 /// strokes: [ [ [dx,dy], [dx,dy], ... ],   // 1st stroke
-///          [ [dx,dy], ... ],             // 2nd stroke
+///          [ [dx,dy], ... ],              // 2nd stroke
 ///           ... ]
 Future<String> drawStrokesOnOriginalAndSave({
   required Uint8List baseImageBytes,
@@ -47,6 +47,7 @@ Future<String> drawStrokesOnOriginalAndSave({
   required double penStrokeWidth,
   required String outputDirPath,
   String? outputFileName,
+  List<img.Color>? strokeColors,
 }) async {
   final base = img.decodeImage(baseImageBytes);
   if (base == null) {
@@ -73,14 +74,18 @@ Future<String> drawStrokesOnOriginalAndSave({
 
   final canvas = img.Image.from(base);
 
-  for (final stroke in strokes) {
+  for (int si = 0; si < strokes.length; si++) {
+    final stroke = strokes[si];
+    final colorForStroke = (strokeColors != null && si < strokeColors.length)
+        ? strokeColors[si]
+       : penColor;
     if (stroke.length < 2) {
-      // 점 하나만 찍은 스트로크면 작은 원으로 찍어주기
+      // One point stroke
       final pt = stroke.firstOrNull;
       if (pt != null) {
         final x = ((pt[0] - dx) * sx).round().clamp(0, origW - 1);
         final y = ((pt[1] - dy) * sy).round().clamp(0, origH - 1);
-        img.drawCircle(canvas, x: x, y: y, radius: (thickness/2).ceil(), color: penColor);
+        img.drawCircle(canvas, x: x, y: y, radius: (thickness/2).ceil(), color: colorForStroke);
       }
       continue;
     }
@@ -99,7 +104,7 @@ Future<String> drawStrokesOnOriginalAndSave({
         y1: y0.round().clamp(0, origH - 1),
         x2: x1.round().clamp(0, origW - 1),
         y2: y1.round().clamp(0, origH - 1),
-        color: penColor,
+        color: colorForStroke,
         thickness: thickness,
       );
     }
